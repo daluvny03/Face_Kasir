@@ -38,7 +38,7 @@ app.add_middleware(
 )
 class ImageData(BaseModel):
     image: str
-    
+
 class RegisterData(BaseModel):
     name: str
     image: str
@@ -65,7 +65,8 @@ def identify(
     faces = detect_faces(image)
     if len(faces) == 0:
         return {
-            "status": "no_face"
+            "status": "no_face",
+            "total_faces": 0
         }
     largest_face = get_largest_face(faces)
     cropped_face = crop_face(
@@ -100,15 +101,23 @@ def identify(
     THRESHOLD = 0.8
     if lowest_distance < THRESHOLD:
         return {
-            "status": "recognized",
-            "name": best_match.name,
-            "distance":
-                float(lowest_distance)
-        }
+        "status": "recognized",
+        "name": best_match.name,
+        "distance":
+            float(lowest_distance),
+        "total_faces":
+            len(faces),
+        "active_face_box":
+            largest_face['box']
+    }
     return {
         "status": "unknown",
         "distance":
-            float(lowest_distance)
+            float(lowest_distance),
+        "total_faces":
+            len(faces),
+        "active_face_box":
+            largest_face['box']
     }
  
 @app.post("/register")

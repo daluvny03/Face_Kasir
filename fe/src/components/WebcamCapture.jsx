@@ -69,6 +69,58 @@ function WebcamCapture() {
         screenshotFormat="image/jpeg"
         width={500}
       />
+      <input
+        type="text"
+        placeholder="Input Name"
+        value={name}
+        onChange={(e) =>
+          setName(e.target.value)
+        }
+        style={{
+          padding: "10px",
+          width: "300px",
+        }}
+      />
+
+      <button onClick={register}>
+        Register Face
+      </button>
+
+      {
+        image && (
+          <img
+            src={image}
+            alt="capture"
+            width={300}
+          />
+        )
+      }
+      {
+        loading && (
+            <p>Scanning Face...</p>
+        )
+      }
+      {
+        result?.total_faces > 1 && (
+          <div
+            style={{
+              backgroundColor: "orange",
+              color: "black",
+              padding: "10px",
+              borderRadius: "10px",
+            }}
+          >
+            <h3>
+              Multiple Faces Detected
+            </h3>
+
+            <p>
+              Active user selected
+              automatically
+            </p>
+          </div>
+        )
+      }
       {
         result?.status === "recognized" && (
             <div
@@ -121,38 +173,6 @@ function WebcamCapture() {
                 No Face Detected
             </h2>
             </div>
-        )
-      }
-
-      <input
-        type="text"
-        placeholder="Input Name"
-        value={name}
-        onChange={(e) =>
-          setName(e.target.value)
-        }
-        style={{
-          padding: "10px",
-          width: "300px",
-        }}
-      />
-
-      <button onClick={register}>
-        Register Face
-      </button>
-
-      {
-        image && (
-          <img
-            src={image}
-            alt="capture"
-            width={300}
-          />
-        )
-      }
-      {
-        loading && (
-            <p>Scanning Face...</p>
         )
       }
 

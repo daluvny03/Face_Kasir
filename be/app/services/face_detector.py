@@ -13,7 +13,8 @@ def get_largest_face(faces):
     return max(
         faces,
         key=lambda face:
-        face['box'][2] * face['box'][3]
+        face['box'][2] *
+        face['box'][3]
     )
 
 def crop_face(image, face):
