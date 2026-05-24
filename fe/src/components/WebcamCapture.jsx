@@ -1,25 +1,30 @@
 import Webcam from "react-webcam";
 import {
   useRef,
-  useState,
-  useEffect,
+  useState
 } from "react";
-
 import {
-  identifyFace,
   registerFace
-} from "../service/api";
+} from "../services/api";
 
 function WebcamCapture() {
   const webcamRef = useRef(null);
-  const [image, setImage] = useState(null);
-  const [result, setResult] = useState(null);
-  const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [name, setName] =
+    useState("");
+  const [loading, setLoading] =
+    useState(false);
+  const [result, setResult] =
+    useState(null);
   const register = async () => {
+    if (!webcamRef.current) return;
+    if (!name) {
+      alert("Input member name");
+      return;
+    }
     const imageSrc =
       webcamRef.current.getScreenshot();
-    setImage(imageSrc);
+    if (!imageSrc) return;
+    setLoading(true);
     try {
       const response =
         await registerFace(
@@ -29,169 +34,209 @@ function WebcamCapture() {
       setResult(response);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
-  const autoIdentify = async () => {
-  if (!webcamRef.current) return;
-  const imageSrc =
-    webcamRef.current.getScreenshot();
-  if (!imageSrc) return;
-  try {
-    setLoading(true);
-    const response =
-      await identifyFace(imageSrc);
-    setResult(response);
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setLoading(false);
-  }
-};
-    useEffect(() => {
-  const interval = setInterval(() => {
-    autoIdentify();
-  }, 3000);
-  return () => clearInterval(interval);
-}, []);
-
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "20px",
-      }}
-    >
-      <Webcam
-        ref={webcamRef}
-        audio={false}
-        screenshotFormat="image/jpeg"
-        width={500}
-      />
-      <input
-        type="text"
-        placeholder="Input Name"
-        value={name}
-        onChange={(e) =>
-          setName(e.target.value)
-        }
-        style={{
-          padding: "10px",
-          width: "300px",
-        }}
-      />
+    <div className="
+      min-h-screen
+      bg-slate-900
+      flex
+      items-center
+      justify-center
+      p-6
+    ">
+      <div className="
+        w-full
+        max-w-5xl
+        bg-slate-800
+        rounded-3xl
+        shadow-2xl
+        overflow-hidden
+        grid
+        grid-cols-1
+        lg:grid-cols-2
+      ">
+        {/* LEFT */}
+        <div className="
+          p-8
+          flex
+          flex-col
+          justify-center
+          text-white
+        ">
+          <p className="
+            text-emerald-400
+            font-semibold
+            mb-2
+          ">
+            MEMBER REGISTRATION
+          </p>
+          <h1 className="
+            text-5xl
+            font-bold
+            leading-tight
+          ">
+            Register
+            Your Face
+          </h1>
+          <p className="
+            text-slate-400
+            mt-6
+            leading-relaxed
+          ">
+            Register your face
+            to activate member
+            benefits and automatic
+            discount at self-service
+            cashier.
+          </p>
+          <div className="
+            mt-10
+          ">
+            <input
+              type="text"
+              placeholder="Input Member Name"
+              value={name}
+              onChange={(e) =>
+                setName(e.target.value)
+              }
+              className="
+                w-full
+                px-5
+                py-4
+                rounded-2xl
+                bg-slate-700
+                text-white
+                outline-none
+              "
+            />
+            <button
+              onClick={register}
+              disabled={loading}
+              className="
+                w-full
+                mt-5
+                py-4
+                rounded-2xl
+                bg-emerald-500
+                hover:bg-emerald-600
+                transition
+                font-bold
+                text-lg
+              "
+            >
+              {
+                loading
+                  ? "Registering..."
+                  : "Register Member"
+              }
 
-      <button onClick={register}>
-        Register Face
-      </button>
-
-      {
-        image && (
-          <img
-            src={image}
-            alt="capture"
-            width={300}
-          />
-        )
-      }
-      {
-        loading && (
-            <p>Scanning Face...</p>
-        )
-      }
-      {
-        result?.total_faces > 1 && (
-          <div
-            style={{
-              backgroundColor: "orange",
-              color: "black",
-              padding: "10px",
-              borderRadius: "10px",
-            }}
-          >
-            <h3>
-              Multiple Faces Detected
-            </h3>
-
-            <p>
-              Active user selected
-              automatically
-            </p>
+            </button>
           </div>
-        )
-      }
-      {
-        result?.status === "recognized" && (
-            <div
-            style={{
-                backgroundColor: "green",
-                color: "white",
-                padding: "20px",
-                borderRadius: "10px",
-            }}
-            >
-            <h2>
-                Welcome,
-                {result.name}
-            </h2>
-
-            <p>
-                Distance:
-                {result.distance}
-            </p>
-            </div>
-        )
-      }
-      {
-        result?.status === "unknown" && (
-            <div
-            style={{
-                backgroundColor: "red",
-                color: "white",
-                padding: "20px",
-                borderRadius: "10px",
-            }}
-            >
-            <h2>
-                Unknown Face
-            </h2>
-            </div>
-        )
-      }
-      {
-        result?.status === "no_face" && (
-            <div
-            style={{
-                backgroundColor: "gray",
-                color: "white",
-                padding: "20px",
-                borderRadius: "10px",
-            }}
-            >
-            <h2>
-                No Face Detected
-            </h2>
-            </div>
-        )
-      }
-
-      {
-        result && (
-          <pre>
-            {
-              JSON.stringify(
-                result,
-                null,
-                2
-              )
-            }
-          </pre>
-        )
-      }
-
+          {
+            result?.status ===
+            "success" && (
+              <div className="
+                mt-8
+                bg-emerald-500/20
+                border
+                border-emerald-400
+                rounded-2xl
+                p-5
+              ">
+                <p className="
+                  text-emerald-400
+                  font-semibold
+                ">
+                  REGISTRATION SUCCESS
+                </p>
+                <h2 className="
+                  text-3xl
+                  font-bold
+                  mt-2
+                ">
+                  {result.name}
+                </h2>
+                <p className="
+                  mt-3
+                  text-slate-300
+                ">
+                  Member face registered
+                  successfully.
+                </p>
+                <p className="
+                  mt-2
+                  text-slate-400
+                  text-sm
+                ">
+                  Total Embeddings:
+                  {" "}
+                  {
+                    result.total_embeddings
+                  }
+                </p>
+              </div>
+            )
+          }
+          {
+            result?.status ===
+            "no_face" && (
+              <div className="
+                mt-8
+                bg-red-500/20
+                border
+                border-red-400
+                rounded-2xl
+                p-5
+              ">
+                <p className="
+                  text-red-400
+                  font-semibold
+                ">
+                  FACE NOT DETECTED
+                </p>
+                <p className="
+                  mt-2
+                  text-slate-300
+                ">
+                  Please position your
+                  face clearly in front
+                  of the camera.
+                </p>
+              </div>
+            )
+          }
+        </div>
+        {/* RIGHT */}
+        <div className="
+          bg-slate-900
+          flex
+          items-center
+          justify-center
+          p-6
+        ">
+          <div className="
+            overflow-hidden
+            rounded-3xl
+            border-4
+            border-slate-700
+            shadow-2xl
+          ">
+            <Webcam
+              ref={webcamRef}
+              audio={false}
+              screenshotFormat="image/jpeg"
+              className="
+                w-full
+                max-w-[500px]
+              "
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
-
 export default WebcamCapture;

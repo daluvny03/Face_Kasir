@@ -19,10 +19,15 @@ from app.database.database import (
     SessionLocal
 )
 from app.model.model_user import User
+from app.model.model_face_embedding import (
+    FaceEmbedding
+)
 from sqlalchemy.orm import Session
 from fastapi import Depends
+from app.services.face_augmentation import (
+    augment_face
+)
 import json
-import numpy as np
 
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
@@ -80,16 +85,19 @@ def identify(
     new_embedding = get_embedding(
         cropped_face
     )
-    users = db.query(User).all()
-    if len(users) == 0:
+    embeddings = db.query(
+        FaceEmbedding
+    ).all()
+    if len(embeddings) == 0:
         return {
             "status": "no_registered_user"
         }
-    best_match = None
+    best_user = None
     lowest_distance = 999
-    for user in users:
+
+    for item in embeddings:
         saved_embedding = json.loads(
-            user.embedding
+            item.embedding
         )
         distance = euclidean_distance(
             new_embedding,
@@ -97,12 +105,15 @@ def identify(
         )
         if distance < lowest_distance:
             lowest_distance = distance
-            best_match = user
+            user = db.query(User).filter(
+                User.id == item.user_id
+            ).first()
+            best_user = user
     THRESHOLD = 0.8
     if lowest_distance < THRESHOLD:
         return {
         "status": "recognized",
-        "name": best_match.name,
+        "name": best_user.name,
         "distance":
             float(lowest_distance),
         "total_faces":
@@ -140,21 +151,36 @@ def register(
         return {
             "status": "invalid_face"
         }
-    embedding = get_embedding(
+    augmented_faces = augment_face(
         cropped_face
     )
-    new_user = User(
-        name=data.name,
-        embedding=json.dumps(
-            embedding.tolist()
+    user = db.query(User).filter(
+        User.name == data.name
+    ).first()
+    if not user:
+        user = User(
+            name=data.name
         )
-    )
-    db.add(new_user)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    total_embeddings = 0
+    for face in augmented_faces:
+        embedding = get_embedding(face)
+        new_embedding = FaceEmbedding(
+            user_id=user.id,
+            embedding=json.dumps(
+                embedding.tolist()
+            )
+        )
+        db.add(new_embedding)
+        total_embeddings += 1
     db.commit()
-    db.refresh(new_user)
     return {
         "status": "success",
-        "user_id": new_user.id,
-        "name": new_user.name
+        "user_id": user.id,
+        "name": user.name,
+        "total_embeddings":
+            total_embeddings
     }
    
