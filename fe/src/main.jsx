@@ -7,7 +7,6 @@ import {
 } from 'react-router-dom'
 import './index.css'
 import CashierPage from './pages/CashierPages.jsx';
-import RegisterPage from './pages/RegisterPages.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
