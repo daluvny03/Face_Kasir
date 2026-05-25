@@ -24,9 +24,6 @@ from app.model.model_face_embedding import (
 )
 from sqlalchemy.orm import Session
 from fastapi import Depends
-from app.services.face_augmentation import (
-    augment_face
-)
 import json
 
 app = FastAPI()
@@ -42,10 +39,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 class ImageData(BaseModel):
-    image: str
-
-class RegisterData(BaseModel):
-    name: str
     image: str
 
 def get_db():
@@ -130,57 +123,3 @@ def identify(
         "active_face_box":
             largest_face['box']
     }
- 
-@app.post("/register")
-def register(
-    data: RegisterData,
-    db: Session = Depends(get_db)
-):
-    image = base64_to_image(data.image)
-    faces = detect_faces(image)
-    if len(faces) == 0:
-        return {
-            "status": "no_face"
-        }
-    largest_face = get_largest_face(faces)
-    cropped_face = crop_face(
-        image,
-        largest_face
-    )
-    if cropped_face is None:
-        return {
-            "status": "invalid_face"
-        }
-    augmented_faces = augment_face(
-        cropped_face
-    )
-    user = db.query(User).filter(
-        User.name == data.name
-    ).first()
-    if not user:
-        user = User(
-            name=data.name
-        )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-    total_embeddings = 0
-    for face in augmented_faces:
-        embedding = get_embedding(face)
-        new_embedding = FaceEmbedding(
-            user_id=user.id,
-            embedding=json.dumps(
-                embedding.tolist()
-            )
-        )
-        db.add(new_embedding)
-        total_embeddings += 1
-    db.commit()
-    return {
-        "status": "success",
-        "user_id": user.id,
-        "name": user.name,
-        "total_embeddings":
-            total_embeddings
-    }
-   

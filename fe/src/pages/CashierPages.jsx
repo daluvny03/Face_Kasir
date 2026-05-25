@@ -18,8 +18,12 @@ function CashierPage() {
     useRef(null);
   const [result, setResult] =
     useState(null);
+  const [sessionLocked, setSessionLocked] =
+    useState(false);
   const autoIdentify =
     async () => {
+      if (sessionLocked)
+        return;
       if (
         !webcamRef.current
       ) return;
@@ -33,10 +37,21 @@ function CashierPage() {
             imageSrc
           );
         setResult(response);
+      if (
+        response.status === "recognized"
+        ||
+        response.status === "unknown"
+        ) {
+        setSessionLocked(true);
+        }
       } catch (error) {
         console.error(error);
       }
     };
+  const finishPayment = () => {
+    setResult(null);
+    setSessionLocked(false);
+  };
   useEffect(() => {
     const interval =
       setInterval(() => {
@@ -94,6 +109,27 @@ function CashierPage() {
                 "recognized"
               }
             />
+            {
+            sessionLocked && (
+                <button
+                onClick={finishPayment}
+                className="
+                    w-full
+                    mt-6
+                    py-4
+                    rounded-2xl
+                    bg-blue-600
+                    hover:bg-blue-700
+                    text-white
+                    font-bold
+                    text-xl
+                    transition
+                "
+                >
+                Finish Payment
+                </button>
+            )
+            }
           </div>
           {/* RIGHT */}
           <div className="

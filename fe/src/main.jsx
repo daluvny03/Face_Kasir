@@ -17,10 +17,6 @@ createRoot(document.getElementById('root')).render(
           path="/"
           element={<CashierPage />}
         />
-        <Route
-          path="/register"
-          element={<RegisterPage />}
-        />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
