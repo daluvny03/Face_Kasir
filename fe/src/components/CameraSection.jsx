@@ -1,13 +1,17 @@
 import Webcam from "react-webcam";
+import useLiveness from "../hooks/useLiveness";
 
-function CameraSection({ webcamRef, isScanning, sessionLocked, result }) {
+function CameraSection({ webcamRef, isScanning, sessionLocked, result, autoIdentify }) {
   const statusColor = isScanning ? "#F59E0B" : sessionLocked ? "#10B981" : "#6366F1";
   const statusBg    = isScanning ? "#FFFBEB" : sessionLocked ? "#ECFDF5" : "#EEF2FF";
   const statusLabel = isScanning ? "Memindai..." : sessionLocked ? "Sesi Aktif" : "Menunggu Pelanggan";
+  
+  // Custom hook untuk liveness detection (kedip mata)
+  const { status } = useLiveness(webcamRef, sessionLocked, autoIdentify);
 
   return (
     <div style={{
-      position: "relative", // PERBAIKAN: Ditambahkan agar overlay sessionLocked tidak bocor keluar container
+      position: "relative",
       background: "#FFFFFF",
       border: "1px solid #E2E8F0",
       borderRadius: "24px",
@@ -28,7 +32,7 @@ function CameraSection({ webcamRef, isScanning, sessionLocked, result }) {
           alignItems: "center",
           color: "#fff",
           zIndex: 10,
-          borderRadius: "24px", // Menyesuaikan dengan border radius container utama
+          borderRadius: "24px",
         }}>
           <div style={{
             width: 70,
@@ -191,20 +195,57 @@ function CameraSection({ webcamRef, isScanning, sessionLocked, result }) {
         )}
       </div>
 
-      {/* Footer / Info */}
+      {/* Liveness Detection Status Footer */}
       <div style={{
-        marginTop: "14px", padding: "10px 14px",
-        background: "#F8FAFF", borderRadius: "10px",
-        border: "1px solid #E0E7FF",
-        display: "flex", alignItems: "center", gap: "8px",
+        marginTop: "14px",
+        padding: "14px",
+        background: "#F8FAFC",
+        borderRadius: "12px",
+        border: "1px solid #E2E8F0",
+        fontSize: "13px",
+        color: "#475569"
       }}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="#94A3B8" strokeWidth="2"/>
-          <path d="M12 16v-4M12 8h.01" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round"/>
-        </svg>
-        <span style={{ fontSize: "12px", color: "#94A3B8", fontWeight: 500 }}>
-          Wajah diproses secara lokal. Pemindaian otomatis setiap 3 detik.
-        </span>
+        {status === "waiting" && (
+          <div>
+            <b style={{ color: "#334155" }}>Waiting Customer</b>
+            <div style={{ marginTop: 4, color: "#64748B" }}>Silakan berdiri di depan kamera.</div>
+          </div>
+        )}
+
+        {status === "calibrating" && (
+          <div>
+            <b style={{ color: "#2563EB" }}>Preparing Camera...</b>
+            <div style={{ marginTop: 4, color: "#64748B" }}>Mohon lihat ke arah kamera.</div>
+          </div>
+        )}
+
+        {status === "blink" && (
+          <div>
+            <b style={{ color: "#D97706" }}>👁 Blink Detection</b>
+            <div style={{ marginTop: 4, color: "#92400E" }}>Silakan berkedip satu kali.</div>
+          </div>
+        )}
+
+        {status === "recognizing" && (
+          <div>
+            <b style={{ color: "#4F46E5" }}>Recognizing...</b>
+            <div style={{ marginTop: 4, color: "#64748B" }}>Sedang melakukan Face Recognition.</div>
+          </div>
+        )}
+
+        {status === "completed" && (
+          <div>
+            <b style={{ color: "#16A34A" }}>Verification Success</b>
+            <div style={{ marginTop: 4, color: "#166534" }}>Face verified successfully.</div>
+          </div>
+        )}
+
+        {status === "timeout" && (
+          <div>
+            <b style={{ color: "#DC2626" }}>Verification Failed</b>
+            <div style={{ marginTop: 4, color: "#991B1B" }}>Silakan coba kembali.</div>
+          </div>
+        )}
       </div>
 
       {/* Global CSS for Animations */}

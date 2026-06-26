@@ -15,34 +15,58 @@ function CashierPage() {
     return () => clearInterval(t);
   }, []);
 
-  const autoIdentify = useCallback(async () => {
-    if (sessionLocked) return;
-    if (!webcamRef.current) return;
+const autoIdentify = useCallback(async () => {
+
+    if(sessionLocked) return;
+
+    if(!webcamRef.current) return;
+
     const imageSrc = webcamRef.current.getScreenshot();
-    if (!imageSrc) return;
+
+    if(!imageSrc) return;
+
     setIsScanning(true);
-    try {
-      const response = await identifyFace(imageSrc);
-      setResult(response);
-      if (response.status === "recognized" || response.status === "unknown") {
-        setSessionLocked(true);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsScanning(false);
+
+    try{
+
+        const response =
+            await identifyFace(imageSrc);
+
+        setResult(response);
+
+        if(
+            response.status==="recognized" ||
+            response.status==="unknown"
+        ){
+
+            setSessionLocked(true);
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+    }finally{
+
+        setIsScanning(false);
+
     }
-  }, [sessionLocked]);
 
-  const finishPayment = () => {
+},[
+    sessionLocked
+]);
+
+const finishPayment = () => {
+
+    resetLiveness();
+
     setResult(null);
-    setSessionLocked(false);
-  };
 
-  useEffect(() => {
-    const interval = setInterval(() => { autoIdentify(); }, 3000);
-    return () => clearInterval(interval);
-  }, [autoIdentify]);
+    setSessionLocked(false);
+
+};
+
 
   const formatTime = (d) =>
     d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
@@ -168,45 +192,7 @@ function CashierPage() {
 
         {/* RIGHT: Camera + Notification */}
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <CameraSection webcamRef={webcamRef} isScanning={isScanning} sessionLocked={sessionLocked} result={result}/>
-
-          {result?.status === "unknown" && (
-            <div style={{
-              background: "#FFF1F2",
-              border: "1px solid #FECDD3",
-              borderRadius: "20px",
-              padding: "24px",
-              animation: "slide-up 0.4s ease forwards",
-              boxShadow: "0 4px 20px rgba(239,68,68,0.1)",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
-                <div style={{
-                  width: "44px", height: "44px", borderRadius: "12px",
-                  background: "#FEE2E2",
-                  display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                }}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="#EF4444" strokeWidth="2" strokeLinecap="round"/>
-                    <circle cx="12" cy="7" r="4" stroke="#EF4444" strokeWidth="2"/>
-                  </svg>
-                </div>
-                <div>
-                  <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: "#EF4444", marginBottom: "2px" }}>
-                    Tamu
-                  </div>
-                  <div style={{ fontSize: "22px", fontWeight: 800, color: "#991B1B" }}>
-                    Pengguna Non-Member
-                  </div>
-                </div>
-              </div>
-              <div style={{
-                padding: "12px 14px", background: "#FEE2E2", borderRadius: "10px",
-                fontSize: "13px", color: "#B91C1C", fontWeight: 500,
-              }}>
-                Tidak ada diskon member yang diterapkan. Harga normal berlaku.
-              </div>
-            </div>
-          )}
+          <CameraSection webcamRef={webcamRef} isScanning={isScanning} sessionLocked={sessionLocked} result={result} autoIdentify={autoIdentify}/>
         </div>
       </main>
 
