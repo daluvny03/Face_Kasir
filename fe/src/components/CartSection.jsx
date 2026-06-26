@@ -1,4 +1,4 @@
-function CartSection({ isMember }) {
+function CartSection({ result }) {
   const items = [
     { name: "Milk", qty: 1, price: 10000 },
     { name: "Bread", qty: 2, price: 15000 },
@@ -6,6 +6,7 @@ function CartSection({ isMember }) {
   ];
 
   const subtotal = items.reduce((acc, item) => acc + item.price * item.qty, 0);
+  const isMember = result?.status === "recognized";
   const discount = isMember ? subtotal * 0.1 : 0;
   const total = subtotal - discount;
 
@@ -36,7 +37,101 @@ function CartSection({ isMember }) {
       </div>
 
       <div style={{ height: "1px", background: "#F1F5F9", marginBottom: "18px" }} />
+        <div
+          style={{
+            marginBottom: "20px",
+            padding: "16px",
+            borderRadius: "14px",
+            background:
+              isMember
+                ? "#ECFDF5"
+                : result?.status === "unknown"
+                ? "#FEF2F2"
+                : "#F8FAFC",
+            border:
+              isMember
+                ? "1px solid #BBF7D0"
+                : result?.status === "unknown"
+                ? "1px solid #FECACA"
+                : "1px solid #E2E8F0",
+          }}
+        >
+          {!result && (
+            <>
+              <div style={{ fontSize: "12px", color: "#64748B", fontWeight: 700 }}>
+                CUSTOMER
+              </div>
 
+              <div
+                style={{
+                  marginTop: "6px",
+                  fontSize: "20px",
+                  fontWeight: 800,
+                  color: "#334155",
+                }}
+              >
+                Waiting Customer
+              </div>
+            </>
+          )}
+
+          {result?.status === "recognized" && (
+            <>
+              <div style={{ fontSize: "12px", color: "#16A34A", fontWeight: 700 }}>
+                MEMBER
+              </div>
+
+              <div
+                style={{
+                  marginTop: "6px",
+                  fontSize: "22px",
+                  fontWeight: 900,
+                  color: "#166534",
+                }}
+              >
+                {result.name}
+              </div>
+
+              <div
+                style={{
+                  marginTop: "6px",
+                  color: "#15803D",
+                  fontWeight: 600,
+                }}
+              >
+                Gold Member • Diskon Aktif
+              </div>
+            </>
+          )}
+
+          {result?.status === "unknown" && (
+            <>
+              <div style={{ fontSize: "12px", color: "#DC2626", fontWeight: 700 }}>
+                GUEST
+              </div>
+
+              <div
+                style={{
+                  marginTop: "6px",
+                  fontSize: "22px",
+                  fontWeight: 900,
+                  color: "#991B1B",
+                }}
+              >
+                Non Member
+              </div>
+
+              <div
+                style={{
+                  marginTop: "6px",
+                  color: "#B91C1C",
+                }}
+              >
+                Harga Normal Berlaku
+              </div>
+            </>
+          )}
+        </div>
       {/* Column headers */}
       <div style={{
         display: "grid", gridTemplateColumns: "1fr 56px 110px",
@@ -138,9 +233,19 @@ function CartSection({ isMember }) {
             }}>
               Rp{total.toLocaleString("id-ID")}
             </div>
-            {isMember && (
+            {isMember ? (
               <div style={{ fontSize: "12px", color: "#10B981", fontWeight: 600, marginTop: "2px" }}>
                 Hemat Rp{discount.toLocaleString("id-ID")}!
+              </div>
+            ) :(
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "#94A3B8",
+                  marginTop: "4px",
+                }}
+              >
+                Harga normal diterapkan
               </div>
             )}
           </div>

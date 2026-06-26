@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { identifyFace } from "../services/api";
 import CameraSection from "../components/CameraSection";
 import CartSection from "../components/CartSection";
-import MemberNotification from "../components/MemberNotification";
 
 function CashierPage() {
   const webcamRef = useRef(null);
@@ -140,7 +139,7 @@ function CashierPage() {
 
         {/* LEFT: Cart + Finish */}
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <CartSection isMember={result?.status === "recognized"} />
+          <CartSection isMember={result} />
 
           {sessionLocked && (
             <button
@@ -169,8 +168,7 @@ function CashierPage() {
 
         {/* RIGHT: Camera + Notification */}
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <CameraSection webcamRef={webcamRef} isScanning={isScanning} sessionLocked={sessionLocked} />
-          <MemberNotification result={result} />
+          <CameraSection webcamRef={webcamRef} isScanning={isScanning} sessionLocked={sessionLocked} result={result}/>
 
           {result?.status === "unknown" && (
             <div style={{
