@@ -139,7 +139,7 @@ function CashierPage() {
 
         {/* LEFT: Cart + Finish */}
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <CartSection isMember={result} />
+          <CartSection result={result} />
 
           {sessionLocked && (
             <button
@@ -170,6 +170,54 @@ function CashierPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
           <CameraSection webcamRef={webcamRef} isScanning={isScanning} sessionLocked={sessionLocked} result={result}/>
 
+          {result?.status === "recognized" && (
+            <div style={{
+              background: "#ECFDF5", // Hijau super soft
+              border: "1px solid #A7F3D0", // Border hijau soft
+              borderRadius: "20px",
+              padding: "24px",
+              animation: "slide-up 0.4s ease forwards",
+              boxShadow: "0 4px 20px rgba(16,185,129,0.1)", // Shadow hijau tipis
+            }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  {/* Icon Container */}
+                  <div style={{
+                    width: "44px", height: "44px", borderRadius: "12px",
+                    background: "#D1FAE5",
+                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                  }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="#10B981" strokeWidth="2" strokeLinecap="round"/>
+                      <circle cx="12" cy="7" r="4" stroke="#10B981" strokeWidth="2"/>
+                    </svg>
+                  </div>
+                  {/* Text Group */}
+                  <div>
+                    <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase", color: "#10B981", marginBottom: "2px" }}>
+                      MEMBER VERIFIED
+                    </div>
+                    <div style={{ fontSize: "22px", fontWeight: 800, color: "#065F46" }}>
+                      {result.name}
+                    </div>
+                    <div style={{ fontSize: "13px", fontWeight: 600, color: "#047857", marginTop: "2px" }}>
+                      Gold Member
+                    </div>
+                  </div>
+                </div>
+                {/* Emoji Selamat */}
+                <div style={{ fontSize: "28px", flexShrink: 0 }}>🎉</div>
+              </div>
+              
+              {/* Alert Box bagian bawah */}
+              <div style={{
+                padding: "12px 14px", background: "#D1FAE5", borderRadius: "10px",
+                fontSize: "13px", color: "#065F46", fontWeight: 500,
+              }}>
+                ✓ Diskon Member 10% berhasil diterapkan.
+              </div>
+            </div>
+          )}
           {result?.status === "unknown" && (
             <div style={{
               background: "#FFF1F2",

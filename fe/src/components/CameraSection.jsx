@@ -21,7 +21,7 @@ function CameraSection({ webcamRef, isScanning, sessionLocked, result }) {
           position: "absolute",
           inset: 0,
           background: "rgba(15,23,42,0.72)",
-          backdropFilter: "blur(4px)",
+          // backdropFilter: "blur(4px)",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
@@ -161,21 +161,10 @@ function CameraSection({ webcamRef, isScanning, sessionLocked, result }) {
                 <div style={{ fontSize: "12px", fontWeight: 700, color: "#10B981", letterSpacing: "2px" }}>
                   MEMBER VERIFIED
                 </div>
-                <div style={{ fontSize: "28px", fontWeight: 900, marginTop: 6, color: "#1E293B" }}>
-                  {result.name}
-                </div>
                 <div style={{ marginTop: 8, color: "#64748B" }}>
                   Gold Member
                 </div>
               </div>
-              <div style={{ fontSize: "52px" }}>🎉</div>
-            </div>
-            <div style={{
-              marginTop: "18px", padding: "14px",
-              background: "#DCFCE7", borderRadius: "12px",
-              fontWeight: 700, color: "#166534"
-            }}>
-              ✓ Diskon Member 10% berhasil diterapkan.
             </div>
           </>
         )}
@@ -189,22 +178,6 @@ function CameraSection({ webcamRef, isScanning, sessionLocked, result }) {
             </p>
           </>
         )}
-      </div>
-
-      {/* Footer / Info */}
-      <div style={{
-        marginTop: "14px", padding: "10px 14px",
-        background: "#F8FAFF", borderRadius: "10px",
-        border: "1px solid #E0E7FF",
-        display: "flex", alignItems: "center", gap: "8px",
-      }}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="#94A3B8" strokeWidth="2"/>
-          <path d="M12 16v-4M12 8h.01" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round"/>
-        </svg>
-        <span style={{ fontSize: "12px", color: "#94A3B8", fontWeight: 500 }}>
-          Wajah diproses secara lokal. Pemindaian otomatis setiap 3 detik.
-        </span>
       </div>
 
       {/* Global CSS for Animations */}
